@@ -2,6 +2,7 @@ package hlq.bluetooth;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
@@ -15,7 +16,11 @@ import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +28,9 @@ import com.mylhyl.acp.Acp;
 import com.mylhyl.acp.AcpListener;
 import com.mylhyl.acp.AcpOptions;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
@@ -38,6 +46,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView bluemessage;
     private TextView scanfinnish;
     private int blueisok = 1;
+    private ListView listview;
+    private ArrayAdapter<String>  adapter;
+    private List<String> list;
+    private List<BluetoothDevice> listdevice;
 
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
@@ -45,9 +57,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        registerReceiver(mReceiver, makeFilter());
         init();
         initblue();
-        registerReceiver(mReceiver, makeFilter());
+
     }
 
     /**
@@ -71,8 +84,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bluemessage = findViewById(R.id.bluemessage);
         scanfinnish = findViewById(R.id.scanfinnish);
         localblumessage = findViewById(R.id.localblumessage);
+        listview = findViewById(R.id.listview);
         buttonscan.setOnClickListener(this);
         sousuo.setOnClickListener(this);
+        list = new ArrayList<>();
+        listdevice = new ArrayList<>();
+
+        /**
+         * listview监听事件 即配对
+         */
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //如果想要取消已经配对的设备，只需要将creatBond改为removeBond
+                try {
+                    //如果想要取消已经配对的设备，只需要将creatBond改为removeBond
+                    Method method = BluetoothDevice.class.getMethod("createBond");
+                    Log.e(getPackageName(), "开始配对");
+                    method.invoke(listdevice.get(position));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
 
@@ -114,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 new AcpListener() {
                     @Override
                     public void onGranted() {
-                        Log.d("来到这里了","来到这里了");
+                        Log.d("来到这里了","来到这里了......");
                         if (bluetoothadapter.isDiscovering()){
                             bluetoothadapter.cancelDiscovery();
                         }
@@ -180,14 +214,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     break;
                 //找到设备
                 case BluetoothDevice.ACTION_FOUND:
+                    Log.d("找设备","找设备");
                     // 从intent中获取设备
                     BluetoothDevice device = intent
                             .getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                    listdevice.add(device);
                     // 判断是否配对过
                     if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
                         // 添加到列表
                         bluemessage.append(device.getName() + ":"
                                 + device.getAddress() + "\n");
+                        list.add(device.getName() + ":" + device.getAddress());
+                        String[] strings = new String[list.size()];
+                        list.toArray(strings);
+                        adapter = new ArrayAdapter<String>(MainActivity.this,android.R.layout.simple_list_item_1,strings);
+                        listview.setAdapter(adapter);
                     }
                     break;
                 //搜索完成
@@ -198,6 +239,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 case BluetoothAdapter.ACTION_DISCOVERY_STARTED:
                     Log.d("开始扫描","开始扫描");
                     break;
+                //状态改变
+                case BluetoothDevice.ACTION_BOND_STATE_CHANGED:
+                    BluetoothDevice de = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                    switch (de.getBondState()) {
+                        case BluetoothDevice.BOND_NONE:
+                            Log.e(getPackageName(), "取消配对");
+                            break;
+                        case BluetoothDevice.BOND_BONDING:
+                             Toast.makeText(MainActivity.this,"配对中",Toast.LENGTH_SHORT).show();
+                            break;
+                        case BluetoothDevice.BOND_BONDED:
+                            Toast.makeText(MainActivity.this,"配对成功",Toast.LENGTH_SHORT).show();
+                            break;
+                    }
+                    break;
+
             }
         }
     };
@@ -208,6 +265,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         filter.addAction(BluetoothDevice.ACTION_FOUND);//找到设备的广播
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);//搜索完成的广播
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);//开始扫描的广播
+        filter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);//状态改变
         return filter;
     }
 
@@ -215,5 +273,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(mReceiver);
+
     }
 }
