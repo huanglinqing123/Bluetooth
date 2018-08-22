@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Bluetooth</string>
+    <string name="huoqubveidilanyamingcheng">获取本地蓝牙名称</string>
 </resources>
