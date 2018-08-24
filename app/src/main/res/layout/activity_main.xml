@@ -9,7 +9,7 @@
     <Button
         android:id="@+id/scan"
         android:text="@string/huoqubveidilanyamingcheng"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <TextView
         android:id="@+id/localblumessage"
@@ -18,7 +18,7 @@
     <Button
         android:text="搜索蓝牙设备"
         android:id="@+id/sousuo"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <TextView
         android:id="@+id/bluemessage"
