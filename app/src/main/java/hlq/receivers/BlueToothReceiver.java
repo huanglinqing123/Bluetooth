@@ -73,7 +73,6 @@ public class BlueToothReceiver extends BroadcastReceiver {
                         break;
                     case BluetoothDevice.BOND_BONDED:
                         ToastUtil.shortShow("配对成功");
-                        EventBus.getDefault().post(new BluRxBean(connectionSuccess,de));
                         break;
                 }
                 break;

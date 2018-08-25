@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Set;
@@ -213,7 +214,7 @@ public class BltManager {
     /**
      * 尝试连接一个设备，子线程中完成，因为会线程阻塞
      *
-     * @param btDev 蓝牙设备对象
+     * @param btDev   蓝牙设备对象
      * @param handler 结果回调事件
      * @return
      */
