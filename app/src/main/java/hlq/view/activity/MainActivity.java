@@ -1,13 +1,11 @@
-package hlq.bluetooth;
+package hlq.view.activity;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -19,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,13 +31,21 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import hlq.base.activity.BaseActivity;
 import hlq.base.bean.BluRxBean;
+import hlq.bluetooth.R;
 import hlq.receivers.BlueToothReceiver;
+import hlq.utils.ToastUtil;
+import hlq.utils.factory.ThreadPoolProxyFactory;
 import recycleview.huanglinqing.com.dialogutils.DialogUtils;
 
 /**
@@ -47,7 +54,7 @@ import recycleview.huanglinqing.com.dialogutils.DialogUtils;
  * 2.搜索蓝牙设备
  * 3.蓝牙配对
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     @BindView(R.id.scan)
     Button scan;
@@ -64,24 +71,27 @@ public class MainActivity extends AppCompatActivity {
 
     private BluetoothManager bluetoothmanger;
     private BluetoothAdapter bluetoothadapter;
-    private ArrayAdapter<String> adapter;
-    private List<String> list;
+    private SimpleAdapter adapter;
+    private List<Map<String, String>> list;
     private List<BluetoothDevice> listdevice;
     private AlertDialog alertDialog;
     private BlueToothReceiver blueToothReceiver = new BlueToothReceiver();
-
+    private String boundDevice = "DeviceName";
+    private int connectionSuccess = 5;//配对成功显示设备
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        EventBus.getDefault().register(this);
         ButterKnife.bind(this);
         registerReceiver(blueToothReceiver, blueToothReceiver.makeFilter());
         init();
         initblue();
+    }
 
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activity_main;
     }
 
     /**
@@ -109,13 +119,24 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //如果想要取消已经配对的设备，只需要将creatBond改为removeBond
-                try {
-                    //如果想要取消已经配对的设备，只需要将creatBond改为removeBond
-                    Method method = BluetoothDevice.class.getMethod("createBond");
-                    Log.e(getPackageName(), "开始配对");
-                    method.invoke(listdevice.get(position));
-                } catch (Exception e) {
-                    e.printStackTrace();
+                //如果已经配对过了进行连接
+                if (list.get(position).getOrDefault("statue", "未配对").equals("已配对")) {
+                    alertDialog = DialogUtils.dialogloading(MainActivity.this,"正在连接",false,false);
+                    ThreadPoolProxyFactory.getNormalThreadPoolProxy().execute(new Runnable() {
+                        @Override
+                        public void run() {
+
+                        }
+                    });
+                } else {
+                    try {
+                        //如果想要取消已经配对的设备，只需要将creatBond改为removeBond
+                        Method method = BluetoothDevice.class.getMethod("createBond");
+                        Log.e(getPackageName(), "开始配对");
+                        method.invoke(listdevice.get(position));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -208,29 +229,44 @@ public class MainActivity extends AppCompatActivity {
      * 1:找到设备
      * 2：扫描完成
      * 3：开始扫描
+     * 4.配对成功跳转到通讯页面
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(BluRxBean bluRxBean) {
-        switch (bluRxBean.getId()){
+        switch (bluRxBean.getId()) {
             case 1:
                 listdevice.add(bluRxBean.getBluetoothDevice());
-                // 判断是否配对过
+                // 添加到列表
+                bluemessage.append(bluRxBean.getBluetoothDevice().getName() + ":"
+                        + bluRxBean.getBluetoothDevice().getAddress() + "\n");
+                Map<String, String> map = new HashMap<>();
+                map.put("deviceName", bluRxBean.getBluetoothDevice().getName() + ":" + bluRxBean.getBluetoothDevice().getAddress());
                 if (bluRxBean.getBluetoothDevice().getBondState() != BluetoothDevice.BOND_BONDED) {
-                    // 添加到列表
-                    bluemessage.append(bluRxBean.getBluetoothDevice().getName() + ":"
-                            + bluRxBean.getBluetoothDevice().getAddress() + "\n");
-                    list.add(bluRxBean.getBluetoothDevice().getName() + ":" + bluRxBean.getBluetoothDevice().getAddress());
-                    String[] strings = new String[list.size()];
-                    list.toArray(strings);
-                    adapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_list_item_1, strings);
-                    listview.setAdapter(adapter);
+                    map.put("statue", "未配对");
+                } else {
+                    map.put("statue", "已配对");
                 }
+                list.add(map);
+                adapter = new SimpleAdapter(MainActivity.this, list, R.layout.devices,
+                        new String[]{"deviceName", "statue"}, new int[]{R.id.devicename, R.id.statue});
+
+                listview.setAdapter(adapter);
                 break;
             case 2:
                 DialogUtils.dimissloading(alertDialog);
                 break;
             case 3:
-                alertDialog = DialogUtils.dialogloading(MainActivity.this,"正在扫描",false,false);
+                alertDialog = DialogUtils.dialogloading(MainActivity.this, "正在扫描", false, false);
+                break;
+            case 4:
+                Intent intent = new Intent(MainActivity.this, Tongxun.class);
+                startActivity(intent);
+                break;
+            case 5:
+                Intent intent1 = new Intent(MainActivity.this, Tongxun.class);
+                startActivity(intent1);
+                break;
+            default:
                 break;
         }
     }

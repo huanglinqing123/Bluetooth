@@ -22,6 +22,7 @@ public class BlueToothReceiver extends BroadcastReceiver {
     private int findDevice = 1;//查找设备
     private int findDeviceIsFinished = 2;//扫描完成
     private int findtart = 3;//开始扫描
+    private int connectionSuccess = 4;//配对成功
 
 
     @Override
@@ -51,18 +52,6 @@ public class BlueToothReceiver extends BroadcastReceiver {
                 BluetoothDevice device = intent
                         .getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 EventBus.getDefault().post(new BluRxBean(findDevice,device));
-//                listdevice.add(device);
-//                // 判断是否配对过
-//                if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
-//                    // 添加到列表
-//                    bluemessage.append(device.getName() + ":"
-//                            + device.getAddress() + "\n");
-//                    list.add(device.getName() + ":" + device.getAddress());
-//                    String[] strings = new String[list.size()];
-//                    list.toArray(strings);
-//                    adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, strings);
-//                    listview.setAdapter(adapter);
-//                }
                 break;
             //搜索完成
             case BluetoothAdapter.ACTION_DISCOVERY_FINISHED:
@@ -78,19 +67,18 @@ public class BlueToothReceiver extends BroadcastReceiver {
                 BluetoothDevice de = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 switch (de.getBondState()) {
                     case BluetoothDevice.BOND_NONE:
-//                        Log.e(getPackageName(), "取消配对");
                         break;
                     case BluetoothDevice.BOND_BONDING:
                         ToastUtil.shortShow("配对中");
                         break;
                     case BluetoothDevice.BOND_BONDED:
                         ToastUtil.shortShow("配对成功");
+                        EventBus.getDefault().post(new BluRxBean(connectionSuccess,de));
                         break;
                 }
                 break;
 
         }
-
 }
 
 

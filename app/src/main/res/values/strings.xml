@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Bluetooth</string>
     <string name="huoqubveidilanyamingcheng">获取本地蓝牙名称</string>
+    <string name="fasong">发送</string>
+    <string name="qingshurufasongdexinxi">请输入发送的信息</string>
+    <string name="ceshishebei">测试设备</string>
 </resources>
