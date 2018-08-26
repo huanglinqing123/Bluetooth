@@ -110,7 +110,6 @@ public class BltManager {
 
     /**
      * 注册广播来接收蓝牙配对信息
-     *
      * @param context
      */
     public void registerBltReceiver(Context context, OnRegisterBltReceiver onRegisterBltReceiver) {

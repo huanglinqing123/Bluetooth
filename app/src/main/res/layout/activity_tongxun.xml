@@ -1,37 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:orientation="vertical"
     android:layout_height="match_parent"
-    tools:context="hlq.view.activity.Tongxun">
+    android:orientation="vertical">
 
     <hlq.widget.TitleBar
         android:id="@+id/titlebar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"></hlq.widget.TitleBar>
+
     <TextView
-        android:id="@+id/content"
+        android:id="@+id/text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:id="@+id/content_ly"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+        </LinearLayout>
+    </ScrollView>
 
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
         <EditText
-            android:id="@+id/sendcontent"
-            android:hint="@string/qingshurufasongdexinxi"
-            android:layout_weight="1"
+            android:id="@+id/go_edit_text"
             android:layout_width="0dp"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_weight="0.8" />
+
         <Button
-            android:id="@+id/sendbutton"
-            android:text="@string/fasong"
+            android:id="@+id/go_text_btn"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:text="发送" />
+
+        <Button
+            android:id="@+id/go_file_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="发文件" />
     </LinearLayout>
-
-
 </LinearLayout>

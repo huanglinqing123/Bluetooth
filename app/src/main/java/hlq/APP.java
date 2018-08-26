@@ -4,6 +4,8 @@ import android.app.Application;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 
+import java.util.logging.Logger;
+
 /**
  * Created by  Huanglinqing on 2018/8/24/024.
  * APPlication 类
@@ -20,6 +22,7 @@ public class APP extends Application {
     public void onCreate() {
         super.onCreate();
         context = getApplicationContext();
+        com.orhanobut.logger.Logger.init();
     }
 
 

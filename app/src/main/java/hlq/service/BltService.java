@@ -4,6 +4,8 @@ import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
+import com.orhanobut.logger.Logger;
+
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;
@@ -59,7 +61,6 @@ public class BltService {
                 bluetoothServerSocket = BltManager.getInstance().getmBluetoothAdapter().listenUsingRfcommWithServiceRecord("hlq.bluetooth", BltContant.SPP_UUID);
             }
         } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -70,6 +71,9 @@ public class BltService {
 
         while (true) {
             try {
+                if (getBluetoothServerSocket() == null){
+                    Log.e("在这里获取的为空","在这里获取的为空");
+                }
                 bluetoothSocket = getBluetoothServerSocket().accept();
                 if (bluetoothSocket != null) {
                     APP.bluetoothSocket = bluetoothSocket;

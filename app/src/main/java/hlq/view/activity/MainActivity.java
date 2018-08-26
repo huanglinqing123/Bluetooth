@@ -95,15 +95,7 @@ public class MainActivity extends BaseActivity {
         BltManager.getInstance().initBltManager(this);
         init();
         initblue();
-        /**
-         * 开启蓝牙服务端
-         */
-        ThreadPoolProxyFactory.getNormalThreadPoolProxy().execute(new Runnable() {
-            @Override
-            public void run() {
-                BltService.getInstance().startBluService();
-            }
-        });
+
     }
 
     @Override
@@ -160,6 +152,17 @@ public class MainActivity extends BaseActivity {
      * 开始扫描蓝牙
      */
     private void startscan() {
+
+        /**
+         * 开启蓝牙服务端
+         */
+        ThreadPoolProxyFactory.getNormalThreadPoolProxy().execute(new Runnable() {
+            @Override
+            public void run() {
+                BltService.getInstance().startBluService();
+            }
+        });
+
         Log.d("开始扫描", "开始扫描了");
         Acp.getInstance(this).request(new AcpOptions.Builder()
                         .setPermissions(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
