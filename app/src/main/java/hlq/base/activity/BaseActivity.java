@@ -11,6 +11,8 @@ import android.view.WindowManager;
 
 import org.greenrobot.eventbus.EventBus;
 
+import hlq.widget.TitleBar;
+
 
 /**
  * Created by huanglinqing on 2018/8/24.
@@ -20,6 +22,7 @@ public abstract class BaseActivity extends Activity {
 
     public Activity mActivity;
 
+    private TitleBar titleBar;
     private final static int RUNTIME_PERMISSION_REQUEST_CODE = 0x1;
 
 
@@ -50,6 +53,7 @@ public abstract class BaseActivity extends Activity {
             window.setStatusBarColor(Color.TRANSPARENT);
             isImmersive = true;
         }
+
 
     }
 

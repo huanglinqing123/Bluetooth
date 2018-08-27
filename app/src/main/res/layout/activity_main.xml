@@ -4,8 +4,12 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="hlq.bluetooth.hlq.view.MainActivity">
+    tools:context="hlq.view.activity.MainActivity">
 
+    <hlq.widget.TitleBar
+        android:id="@+id/titlebar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"></hlq.widget.TitleBar>
     <Button
         android:id="@+id/scan"
         android:text="@string/huoqubveidilanyamingcheng"

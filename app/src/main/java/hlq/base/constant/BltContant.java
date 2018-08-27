@@ -22,4 +22,13 @@ public class BltContant {
     public static final int BLUE_TOOTH_MY_SEARTH = BLUE_TOOTH_SEARTH + 1;
     //关闭蓝牙连接
     public static final int BLUE_TOOTH_CLEAR = BLUE_TOOTH_MY_SEARTH + 1;
+
+
+    /**
+     * 通讯返回值
+     */
+    public static final int SEND_TEXT_SUCCESS = 50;//发送文字消息成功
+    public static final int SEND_FILE_SUCCESS = 51;//发送文件信息成功
+    public static final int SEND_FILE_NOTEXIT = 52;//发送的文件不存在
+    public static final int SEND_FILE_IS_FOLDER = 53;//发送的诗歌文件夹
 }

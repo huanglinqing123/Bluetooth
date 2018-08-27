@@ -31,24 +31,24 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
         <EditText
             android:id="@+id/go_edit_text"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="0.8" />
+           />
 
         <Button
             android:id="@+id/go_text_btn"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="发送" />
+            android:text="发送文字" />
 
         <Button
             android:id="@+id/go_file_btn"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="发文件" />
+            android:text="发送默认文件" />
     </LinearLayout>
 </LinearLayout>

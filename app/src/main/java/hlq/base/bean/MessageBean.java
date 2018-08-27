@@ -10,6 +10,10 @@ public class MessageBean {
     private int id;
     private String content;
 
+    public MessageBean(int id) {
+        this.id = id;
+    }
+
     public int getId() {
         return id;
     }

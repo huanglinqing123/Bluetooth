@@ -1,6 +1,9 @@
 package hlq.view.activity;
 
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Environment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -17,9 +20,11 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import hlq.base.activity.BaseActivity;
 import hlq.base.bean.MessageBean;
+import hlq.base.constant.BltContant;
 import hlq.bluetooth.R;
 import hlq.service.ReceiveSocketService;
 import hlq.service.SendSocketService;
+import hlq.utils.ToastUtil;
 import hlq.utils.factory.ThreadPoolProxyFactory;
 import hlq.widget.TitleBar;
 
@@ -44,6 +49,9 @@ public class Tongxun extends BaseActivity {
         super.onCreate(savedInstanceState);
         ButterKnife.bind(this);
         titlebar.setTitle(getIntent().getStringExtra("devicename"));
+        titlebar.setBackgroundResource(R.color.blue);
+        titlebar.setImmersive(true);
+        titlebar.setTitleColor(Color.WHITE);
         //开启消息接收端
         ThreadPoolProxyFactory.getNormalThreadPoolProxy().execute(new Runnable() {
             @Override
@@ -71,16 +79,22 @@ public class Tongxun extends BaseActivity {
         switch (view.getId()) {
             case R.id.go_text_btn:
                 //发送文字消息
-                SendSocketService.sendMessage(goEditText.getText().toString());
+                if (TextUtils.isEmpty(goEditText.getText().toString())) {
+                    ToastUtil.shortShow("请先输入信息");
+                } else {
+                    SendSocketService.sendMessage(goEditText.getText().toString());
+                }
                 break;
             case R.id.go_file_btn:
+                SendSocketService.sendMessageByFile(Environment.getExternalStorageDirectory()+"/test.png");
                 break;
         }
     }
 
     /**
      * RECEIVER_MESSAGE:21 收到消息
-     *
+     * BltContant.SEND_TEXT_SUCCESS:发送消息成功
+     *BltContant.SEND_FILE_NOTEXIT:文件不存在
      * @param messageBean
      */
 
@@ -88,8 +102,18 @@ public class Tongxun extends BaseActivity {
     public void onMessageEvent(MessageBean messageBean) {
         switch (messageBean.getId()) {
             case 21:
-                Log.d("收到消息",messageBean.getContent());
-                text.append(messageBean.getContent());
+                Log.d("收到消息", messageBean.getContent());
+                text.append("收到消息:" + messageBean.getContent());
+                break;
+            case BltContant.SEND_TEXT_SUCCESS:
+                text.append("我:" + goEditText.getText().toString());
+                goEditText.setText("");
+                break;
+            case BltContant.SEND_FILE_NOTEXIT:
+                ToastUtil.shortShow("发送的文件不存在，内存根目录下的test.png");
+                break;
+            case BltContant.SEND_FILE_IS_FOLDER:
+                ToastUtil.shortShow("不能传送一个文件夹");
                 break;
             default:
                 break;
