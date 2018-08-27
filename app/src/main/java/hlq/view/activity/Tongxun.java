@@ -95,6 +95,7 @@ public class Tongxun extends BaseActivity {
      * RECEIVER_MESSAGE:21 收到消息
      * BltContant.SEND_TEXT_SUCCESS:发送消息成功
      *BltContant.SEND_FILE_NOTEXIT:文件不存在
+     * BltContant.SEND_FILE_IS_FOLDER:不能发送文件夹
      * @param messageBean
      */
 
