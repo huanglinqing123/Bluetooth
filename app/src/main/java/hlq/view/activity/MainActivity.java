@@ -81,8 +81,6 @@ public class MainActivity extends BaseActivity {
     private List<BluetoothDevice> listdevice;
     private AlertDialog alertDialog;
     private BlueToothReceiver blueToothReceiver = new BlueToothReceiver();
-    private String boundDevice = "DeviceName";
-    private int connectionSuccess = 5;//配对成功显示设备
     private int connectsuccess = 12;//连接成功
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
@@ -131,9 +129,10 @@ public class MainActivity extends BaseActivity {
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                //如果想要取消已经配对的设备，只需要将creatBond改为removeBond
-                //如果已经配对过了进行连接
-                if (list.get(position).getOrDefault("statue", "未配对").equals("已配对")) {
+
+                Map<String,String> map;
+                map = list.get(position);
+                if (map.get("statue").equals("已配对")) {
                     alertDialog = DialogUtils.dialogloading(MainActivity.this, "正在连接", false, false);
                     ThreadPoolProxyFactory.getNormalThreadPoolProxy().execute(new Runnable() {
                         @Override
@@ -154,7 +153,6 @@ public class MainActivity extends BaseActivity {
                 }
             }
 
-
         });
     }
 
@@ -162,6 +160,16 @@ public class MainActivity extends BaseActivity {
      * 开始扫描蓝牙
      */
     private void startscan() {
+
+        Intent enabler = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+        startActivity(enabler);
+
+        list.clear();
+        if (adapter != null){
+            adapter.notifyDataSetChanged();
+            bluemessage.setText("");
+            listdevice.clear();
+        }
 
         /**
          * 开启蓝牙服务端
@@ -256,7 +264,7 @@ public class MainActivity extends BaseActivity {
      * 1:找到设备
      * 2：扫描完成
      * 3：开始扫描
-     * 4.配对成功跳转到通讯页面
+     * 4.配对成功
      * 11:有设备连接进来
      * 12:连接成功
      */
@@ -264,7 +272,6 @@ public class MainActivity extends BaseActivity {
     public void onMessageEvent(BluRxBean bluRxBean) {
         Intent intent = null;
         switch (bluRxBean.getId()) {
-
             case 1:
                 listdevice.add(bluRxBean.getBluetoothDevice());
                 // 添加到列表
@@ -292,6 +299,7 @@ public class MainActivity extends BaseActivity {
             case 11:
             case 12:
                 alertDialog.dismiss();
+
                 intent = new Intent(MainActivity.this, Tongxun.class);
                 intent.putExtra("devicename", bluRxBean.getBluetoothDevice().getName());
                 startActivity(intent);

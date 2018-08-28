@@ -104,10 +104,10 @@ public class Tongxun extends BaseActivity {
         switch (messageBean.getId()) {
             case 21:
                 Log.d("收到消息", messageBean.getContent());
-                text.append("收到消息:" + messageBean.getContent());
+                text.append("收到消息:" + messageBean.getContent() + "\n");
                 break;
             case BltContant.SEND_TEXT_SUCCESS:
-                text.append("我:" + goEditText.getText().toString());
+                text.append("我:" + goEditText.getText().toString() + "\n");
                 goEditText.setText("");
                 break;
             case BltContant.SEND_FILE_NOTEXIT:
